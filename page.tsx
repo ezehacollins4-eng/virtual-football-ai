@@ -57,17 +57,18 @@ export default function HomePage() {
     setAnalysis(null);
     setLoading(true);
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          home: home.trim(),
-          away: away.trim(),
-          homeOdds: Number(homeOdds),
-          drawOdds: Number(drawOdds),
-          awayOdds: Number(awayOdds),
-        }),
-      });
+      const responseText = await response.text();
+
+let result: any;
+
+try {
+  result = JSON.parse(responseText);
+} catch {
+  console.error("API returned non-JSON:", responseText.slice(0, 300));
+  throw new Error(
+    `The API returned HTML or invalid JSON (HTTP ${response.status}). Check the Render logs.`
+  );
+});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not analyse these odds.");
       const record: Analysis = {
